@@ -2,26 +2,12 @@ import requests
 from bs4 import BeautifulSoup
 import pyfiglet
 from termcolor import colored
+import time
 
 def banner():
     banner = pyfiglet.figlet_format('RAE')
     print(colored(banner, 'blue'))
-    menu()
-
-def menu():
-    print('\n')
-    print('1 - Buscar una palabra')
-    print('0 - Salir')
-    print('\n')
-
-    decision = input('Escribe el número de una de las opciones: ')
-
-    if(decision == '1'):
-        askWord()
-    else:
-        close_banner = pyfiglet.figlet_format('Hasta la vista')
-        print(colored(close_banner, 'yellow'))
-        exit()
+    askWord()
 
 def askWord():
     print('\n')
@@ -38,12 +24,31 @@ def searchWord(word):
 
     if(significates == None):
         print("\nLa palabra " + colored(word, 'red') + " no existe en la RAE o está mal escrita.\n")
-        input('Pulsa cualquier tecla para continuar ...')
-        menu()
+        possible = soup.find_all('div', class_='n1')
+        if(len(possible) == 0):
+            input('Pulsa cualquier tecla para continuar ...')
+            askWord()
+        else:
+            print('\nQuizás quisiste escribir: \n')
+            for i in range(len(possible)):
+                print(colored('- ' + possible[i].text, 'blue'))
+            askWord()
     else:
         print(colored(significates.text, 'green'))
         print('\n')
         input('Pulsa cualquier tecla para continuar ...')
-        menu()
+        askWord()
 
-banner()
+def closeRAE():
+    print(colored('\n\nCerrando RAE ...', 'yellow'))
+    print('\n')
+    time.sleep(1)
+    close_banner = pyfiglet.figlet_format('Hasta la vista')
+    print(colored(close_banner, 'yellow'))
+    exit()
+
+if __name__ == '__main__':
+    try:
+        banner()
+    except KeyboardInterrupt:
+        closeRAE()
